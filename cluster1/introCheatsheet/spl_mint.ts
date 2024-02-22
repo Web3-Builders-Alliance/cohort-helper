@@ -1,7 +1,7 @@
 import { Connection, Keypair, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { getOrCreateAssociatedTokenAccount, mintTo, getAssociatedTokenAddressSync, createAssociatedTokenAccountIdempotentInstruction } from "@solana/spl-token"
 
-import wallet from "/Users/leo/.config/solana/id.json"
+import wallet from "your-wallet-path.json";
 
 //Connect our WBA Wallet
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));

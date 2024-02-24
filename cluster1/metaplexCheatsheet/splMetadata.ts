@@ -1,10 +1,5 @@
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults"
-import { 
-    createMetadataAccountV3, 
-    CreateMetadataAccountV3InstructionAccounts, 
-    CreateMetadataAccountV3InstructionArgs,
-    DataV2Args
-} from "@metaplex-foundation/mpl-token-metadata";
+import { createMetadataAccountV3, CreateMetadataAccountV3InstructionAccounts, CreateMetadataAccountV3InstructionArgs, DataV2Args } from "@metaplex-foundation/mpl-token-metadata";
 import { createSignerFromKeypair, signerIdentity, publicKey } from "@metaplex-foundation/umi";
 import { publicKey as publicKeySerializer, string } from '@metaplex-foundation/umi/serializers';
 
@@ -28,12 +23,18 @@ const RPC_ENDPOINT = "https://api.devnet.solana.com";
     Going forward, this is the endpoint or Connection that will be used every time you 
     call a method on the RPC interface.
 
-    // You can use an explicit Connection instance from web3.js.
-    const umi = createUmi(new Connection(RPC_ENDPOINT));
+    - You can use an explicit Connection instance from web3.js.
+    >> const umi = createUmi(new Connection(RPC_ENDPOINT));
+
+    - You can use the web3JsRpc plugin
+    >> import { web3JsRpc } from '@metaplex-foundation/umi-rpc-web3js';
+
+    >> const umi = createUmi();
+    >> umi.use(web3JsRpc('https://api.mainnet-beta.solana.com'))
+
+    - You can just pass in your RPC endpoint directly
 
 */
-
-// Or just pass in Pass in your RPC endpoint
 const umi = createUmi(RPC_ENDPOINT);
 
 /* 
@@ -53,9 +54,9 @@ const umi = createUmi(RPC_ENDPOINT);
     - Restore a keypair using a seed.
     const myKeypair = umi.eddsa.createKeypairFromSeed(mySeed);
 
-*/
+    - Restore a keypair using its secret key.
 
-// Restore a keypair using its secret key.
+*/
 const myKeypair = umi.eddsa.createKeypairFromSecretKey(new Uint8Array(wallet));
 
 /*
@@ -77,13 +78,14 @@ const signerKeypair = createSignerFromKeypair(umi, myKeypair);
     
     Umi provides plugins to quickly assign new signers to these attributes. 
 
-    - umi.use(signerIdentity(mySigner)); == [umi.identity = mySigner && umi.payer = mySigner]
-    - umi.use(signerIdentity(mySigner, false)) == [umi.identity = mySigner]
-    - umi.use(signerPayer(mySigner)) == [umi.payer = mySigner]
+    >> umi.use(signerIdentity(mySigner)); == [umi.identity = mySigner && umi.payer = mySigner]
+    >> umi.use(signerIdentity(mySigner, false)) == [umi.identity = mySigner]
+    >> umi.use(signerPayer(mySigner)) == [umi.payer = mySigner]
+
+    [Note: The signerIdentity method will also update the payer attribute since, in most cases, 
+    the identity is also the payer.]
 
 */
-
-// The signerIdentity method will also update the payer attribute since, in most cases, the identity is also the payer.
 umi.use(signerIdentity(signerKeypair));
 
 /*
@@ -92,19 +94,18 @@ umi.use(signerIdentity(signerKeypair));
     type to tell TypeScript that the given public key has been verified and is valid. We also use 
     a type parameter to offer more granular type safety.
 
+    [Note: if the provided input cannot be converted to a valid public key, an error will be thrown]
+
     We can generate a new valid public key with 3 different methods:
 
     - From a 32-byte buffer.
-    publicKey(new Uint8Array(32));
+    >> publicKey(new Uint8Array(32));
 
     - From a PublicKey or Signer type.
-    publicKey(someWallet as PublicKey | Signer);
+    >> publicKey(someWallet as PublicKey | Signer);
     
-    [Note: if the provided input cannot be converted to a valid public key, an error will be thrown]
-
+    - From a base58 string.
 */
-
-// From a base58 string.
 const mint =  publicKey('BvrY7utmPBGFwQQhdJkKHfziorchVm82GYTrSxoVjfjz')
 const tokenMetadataProgramId = publicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
 
@@ -231,16 +232,16 @@ const metadata_pda = umi.eddsa.findPda(tokenMetadataProgramId, seeds);
         When confirming the transaction, we have to provide a confirm strategy which can be of type blockhash or durableNonce, 
         each of them requiring a different set of parameters. Here's how we would send and confirm a transaction using the blockhash strategy.
 
-        const signedTransaction = await builder.buildAndSign(umi);
-        const signature = await umi.rpc.sendTransaction(signedTransaction);
-        const confirmResult = await umi.rpc.confirmTransaction(signature, {
-            strategy: { type: 'blockhash', ...(await umi.rpc.getLatestBlockhash()) }
-        });
+        >> const signedTransaction = await builder.buildAndSign(umi);
+        >> const signature = await umi.rpc.sendTransaction(signedTransaction);
+        >> const confirmResult = await umi.rpc.confirmTransaction(signature, {
+        >>     strategy: { type: 'blockhash', ...(await umi.rpc.getLatestBlockhash()) }
+        >> });
 
         Since this is a very common task, Umi provides helper methods on the transaction builder to do this for us. 
         That way, the code above can be rewritten as follows:
 
-        const confirmResult = await builder.sendAndConfirm(umi);
+        >> const confirmResult = await builder.sendAndConfirm(umi);
 
     */
 
@@ -250,10 +251,10 @@ const metadata_pda = umi.eddsa.findPda(tokenMetadataProgramId, seeds);
 
         The transaction factory interface can also be used to serialize and deserialize transactions and their messages.
 
-        const mySerializedTransaction = umi.transactions.serialize(myTransaction);
-        const myTransaction = umi.transactions.deserialize(mySerializedTransaction);
-        const mySerializedMessage = umi.transactions.serializeMessage(myMessage);
-        const myMessage = umi.transactions.deserializeMessage(mySerializedMessage);
+        >> const mySerializedTransaction = umi.transactions.serialize(myTransaction);
+        >> const myTransaction = umi.transactions.deserialize(mySerializedTransaction);
+        >> const mySerializedMessage = umi.transactions.serializeMessage(myMessage);
+        >> const myMessage = umi.transactions.deserializeMessage(mySerializedMessage);
 
     */
     const signature = umi.transactions.deserialize(result.signature);

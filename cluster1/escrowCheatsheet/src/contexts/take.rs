@@ -9,17 +9,18 @@ pub struct Take<'info> {
     pub taker: Signer<'info>,
     #[account(mut)]
     pub maker: SystemAccount<'info>,
-    pub mint_x: InterfaceAccount<'info, Mint>,
-    pub mint_y: InterfaceAccount<'info, Mint>,
     #[account(
         mut,
-        has_one = mint_x,
-        has_one = mint_y,
         close = maker,
         seeds = [b"escrow", maker.key().as_ref(), escrow.seed.to_le_bytes().as_ref()],
         bump = escrow.bump,
+        has_one = mint_x,
+        has_one = mint_y,
     )]
     pub escrow: Account<'info, Escrow>,
+
+    pub mint_x: InterfaceAccount<'info, Mint>,
+    pub mint_y: InterfaceAccount<'info, Mint>,
     #[account(
         init_if_needed,
         payer = taker,
@@ -35,7 +36,8 @@ pub struct Take<'info> {
     )]
     pub taker_mint_y_ata: InterfaceAccount<'info, TokenAccount>,
     #[account(
-        mut,
+        init_if_needed,
+        payer = taker,
         associated_token::mint = mint_y,
         associated_token::authority = maker,
     )]
@@ -46,6 +48,7 @@ pub struct Take<'info> {
         associated_token::authority = escrow,
     )]
     pub vault: InterfaceAccount<'info, TokenAccount>,
+    
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,

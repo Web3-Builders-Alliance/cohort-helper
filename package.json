@@ -1,0 +1,27 @@
+{
+  "name": "cohort-helper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Web3-Builders-Alliance/solana-cohort.git",
+  "author": "L0STE <125566964+L0STE@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "splInit": "ts-node ./Class1/spl_init.ts",
+    "splMint": "ts-node ./Class1/spl_mint.ts",
+    "splTransfer": "ts-node ./Class1/spl_transfer.ts",
+    "splMetadata": "ts-node ./Class2/spl_metadata.ts",
+    "uploadImage": "ts-node ./Class2/upload_image.ts",
+    "mintNft": "ts-node ./Class3/mint_nft.ts",
+    "nftMetadata": "ts-node ./Class3/nft_metadata.ts"
+  },
+
+  "dependencies": {
+    "@solana/web3.js": "^1.91.8",
+    "@types/node": "^20.12.11",
+    "bs58": "^5.0.0",
+    "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}
